@@ -1,0 +1,63 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model MsUser {
+  user_id     Int        @id @default(autoincrement())
+  username    String     @db.VarChar(255)
+  password    String
+  user_status Boolean    @default(true)
+  created_at  DateTime?  @default(now())
+  updated_at  DateTime?
+  pegawai     MsPegawai? @relation(fields: [pegawai_id], references: [pegawai_id])
+  pegawai_id  Int?       @unique
+
+  @@map("ms_user")
+}
+
+model MsPegawai {
+  pegawai_id     Int     @id @default(autoincrement())
+  pegawai_kode   String  @db.VarChar(50)
+  pegawai_nama   String  @db.VarChar(255)
+  pegawai_status Boolean @default(true)
+  MsUser         MsUser?
+
+  @@map("ms_pegawai")
+}
+
+model MsGroup {
+  group_id     Int         @id @default(autoincrement())
+  group_kode   String      @db.VarChar(10)
+  group_nama   String      @db.VarChar(255)
+  group_status Boolean?    @default(true)
+  GroupMenu    GroupMenu[]
+
+  @@map("ms_group")
+}
+
+model MsMenu {
+  menu_id        Int         @id @default(autoincrement())
+  menu_kode      String      @db.VarChar(10)
+  menu_nama      String      @db.VarChar(255)
+  menu_status    Boolean?    @default(true)
+  menu_link      String?     @db.VarChar(255)
+  parent_menu_id Int?        @default(0)
+  GroupMenu      GroupMenu[]
+
+  @@map("ms_menu")
+}
+
+model GroupMenu {
+  gm_id    Int      @id @default(autoincrement())
+  group    MsGroup? @relation(fields: [group_id], references: [group_id], onDelete: Cascade, onUpdate: Cascade)
+  group_id Int?
+  menu     MsMenu?  @relation(fields: [menu_id], references: [menu_id], onDelete: Cascade, onUpdate: Cascade)
+  menu_id  Int?
+
+  @@map("group_menu")
+}

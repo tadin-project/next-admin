@@ -1,95 +1,107 @@
-import Image from 'next/image'
-import styles from './page.module.css'
+"use client";
+import { FormEvent, useState } from "react";
+import { redirect, useRouter } from "next/navigation";
+import axios, { AxiosError, AxiosResponse } from "axios";
 
-export default function Home() {
+import { AuthLayout } from "@/components/templates";
+import { AppRoutes } from "@/constants";
+import { TemplateResponse } from "@/types/api/template_response";
+import toast from "react-hot-toast";
+
+const LoginPage = () => {
+  const [isLoading, setIsLoading] = useState(false);
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const router = useRouter();
+
+  const submitHandler = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setIsLoading(true);
+    axios
+      .post(AppRoutes.api.login, {
+        username,
+        password,
+      })
+      .then((res: AxiosResponse) => {
+        const data: TemplateResponse = res.data;
+        if (data.error) {
+          throw new Error(data.error);
+        } else {
+          toast.success("Berhasil login");
+          router.push(AppRoutes.dashboard);
+        }
+      })
+      .catch((err: Error | AxiosError) => {
+        let errorMessage = "Error";
+        if (axios.isAxiosError(err)) {
+          if (err.response) {
+            errorMessage = err.response.data.error;
+            if (!errorMessage) {
+              errorMessage = err.response.statusText;
+            }
+          }
+        } else {
+          errorMessage = err.message;
+        }
+        toast.error(errorMessage);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  };
+
   return (
-    <main className={styles.main}>
-      <div className={styles.description}>
-        <p>
-          Get started by editing&nbsp;
-          <code className={styles.code}>app/page.tsx</code>
-        </p>
-        <div>
-          <a
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{' '}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className={styles.vercelLogo}
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
+    <AuthLayout>
+      <main>
+        <div className="container">
+          <div className="row justify-content-center my-5">
+            <div className="col-lg-5">
+              <div className="card shadow-lg border-0 rounded-lg">
+                <div className="card-header">
+                  <h3 className="text-center font-weight-light my-4">Login</h3>
+                </div>
+                <div className="card-body">
+                  <form onSubmit={(e) => submitHandler(e)}>
+                    <div className="form-floating mb-3">
+                      <input
+                        className="form-control"
+                        type="text"
+                        placeholder="Masukkan username"
+                        id="username"
+                        value={username}
+                        onChange={(e) => setUsername(e.target.value)}
+                      />
+                      <label htmlFor="username">Username</label>
+                    </div>
+                    <div className="form-floating mb-3">
+                      <input
+                        className="form-control"
+                        id="password"
+                        type="password"
+                        placeholder="Password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                      />
+                      <label htmlFor="password">Password</label>
+                    </div>
+                    <div className="d-flex align-items-center justify-content-between mt-4 mb-0">
+                      <button
+                        type="submit"
+                        className="btn btn-primary"
+                        disabled={isLoading}
+                      >
+                        Login
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
+      </main>
+    </AuthLayout>
+  );
+};
 
-      <div className={styles.center}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
-
-      <div className={styles.grid}>
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Docs <span>-&gt;</span>
-          </h2>
-          <p>Find in-depth information about Next.js features and API.</p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Learn <span>-&gt;</span>
-          </h2>
-          <p>Learn about Next.js in an interactive course with&nbsp;quizzes!</p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Templates <span>-&gt;</span>
-          </h2>
-          <p>Explore starter templates for Next.js.</p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Deploy <span>-&gt;</span>
-          </h2>
-          <p>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
-  )
-}
+export default LoginPage;
