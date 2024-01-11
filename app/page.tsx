@@ -1,11 +1,11 @@
 "use client";
 import { FormEvent, useState } from "react";
-import { redirect, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import axios, { AxiosError, AxiosResponse } from "axios";
 
 import { AuthLayout } from "@/components/templates";
 import { AppRoutes } from "@/constants";
-import { TemplateResponse } from "@/types/api/template_response";
+import { TemplateResponse } from "@/types/api/TemplateResponse";
 import toast from "react-hot-toast";
 
 const LoginPage = () => {

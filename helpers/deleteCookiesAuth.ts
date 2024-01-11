@@ -1,9 +1,7 @@
-import { NextRequest } from "next/server";
+import { cookies } from "next/headers";
 
-const deleteCookiesAuth = (request: NextRequest) => {
-  request.cookies.delete("expiresIn");
-  request.cookies.delete("token");
-  request.cookies.delete("tokenType");
+const deleteCookiesAuth = () => {
+  cookies().delete("token");
 };
 
 export default deleteCookiesAuth;

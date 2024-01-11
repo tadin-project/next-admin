@@ -3,7 +3,7 @@ import { cookies } from "next/headers";
 
 import { appResponse, generateToken, getErrorMessage } from "@/helpers";
 import { authRepository } from "@/repositories";
-import { TemplateResponse } from "@/types/api/template_response";
+import { TemplateResponse } from "@/types/api/TemplateResponse";
 
 const login = async (
   username: string,
@@ -29,16 +29,15 @@ const login = async (
       return res;
     }
 
-    const expiresIn = 60 * 60 * 24;
-    const token = generateToken({ userId: user.user_id }, expiresIn);
-    const currentTime = new Date();
-
-    cookies().set("token", token);
-    cookies().set("tokenType", "Bearer");
-    cookies().set(
-      "expiresIn",
-      new Date(currentTime.getTime() + expiresIn * 1000).toISOString()
+    const expiresIn = 60 * 60;
+    const token = await generateToken(
+      { userId: user.user_id },
+      expiresIn / 60 + "m"
     );
+
+    cookies().set("token", token, {
+      expires: Date.now() + expiresIn * 1000,
+    });
 
     res.data = {
       token,

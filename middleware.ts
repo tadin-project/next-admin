@@ -1,28 +1,28 @@
 import { NextRequest, NextResponse } from "next/server";
-import { deleteCookiesAuth } from "./helpers";
+import { deleteCookiesAuth, verifyToken } from "./helpers";
+import { TemplateResponse } from "./types/api/TemplateResponse";
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const url = new URL(request.url);
   const path = url.pathname;
   if (path === "/") {
   } else {
+    console.log(request.cookies.get("token"));
     const loginUrl = new URL("/", request.url);
-    if (!request.cookies.has("expiresIn")) {
+    if (!request.cookies.has("token")) {
       return NextResponse.redirect(loginUrl);
     }
 
-    if (!request.cookies.get("expiresIn")!.value) {
+    if (!request.cookies.get("token")!.value) {
       deleteCookiesAuth(request);
       return NextResponse.redirect(loginUrl);
     }
 
-    const currentTime = new Date();
-    const expireTime = new Date(request.cookies.get("expiresIn")!.value);
-    if (expireTime <= currentTime) {
+    const checkToken: TemplateResponse = await verifyToken(request);
+    if (checkToken.error) {
       deleteCookiesAuth(request);
       return NextResponse.redirect(loginUrl);
     }
-    // console.log(request.cookies.get("expiresIn")!.value);
   }
   return NextResponse.next();
 }

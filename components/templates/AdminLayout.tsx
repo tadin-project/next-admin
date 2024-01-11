@@ -2,15 +2,20 @@
 import { faBars, faUser } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useState } from "react";
-import { Sidebar } from "..";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
+import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
+
 import { AppRoutes } from "@/constants";
+
+import { Sidebar } from "..";
 
 type AdminLayoutProps = {
   children: React.ReactNode;
 };
 
 const AdminLayout = ({ children }: AdminLayoutProps) => {
+  const router = useRouter();
   const [showSidebar, setShowSidebar] = useState(true);
   const handleSidebar = () => {
     setShowSidebar((e) => !e);
@@ -20,10 +25,26 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
     axios
       .post(AppRoutes.api.logout, {})
       .then((res) => {
-        console.log(res);
+        if (res.data.error) {
+          toast.error(res.data.error);
+          return;
+        }
+        toast.success("Berhasil logout");
+        router.push(AppRoutes.login);
       })
-      .catch((err) => {
-        console.log(err);
+      .catch((err: Error | AxiosError) => {
+        let errorMessage = "Error";
+        if (axios.isAxiosError(err)) {
+          if (err.response) {
+            errorMessage = err.response.data.error;
+            if (!errorMessage) {
+              errorMessage = err.response.statusText;
+            }
+          }
+        } else {
+          errorMessage = err.message;
+        }
+        toast.error(errorMessage);
       });
   };
 

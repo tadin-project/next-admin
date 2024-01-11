@@ -8,6 +8,8 @@ const AppRoutes = {
   users: "/users",
   // api
   api: {
+    users: api + "users",
+    // auth
     login: api + "login",
     logout: api + "logout",
   },

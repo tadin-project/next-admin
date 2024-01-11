@@ -1,6 +1,6 @@
 // import { TemplateResponse } from "@/types/api/template_response";
 import { authService } from "@/services";
-import { TemplateResponse } from "@/types/api/template_response";
+import { TemplateResponse } from "@/types/api";
 
 const POST = async (req: Request) => {
   const { username, password } = await req.json();

@@ -1,6 +1,6 @@
-import { TemplateResponse } from "@/types/api/template_response";
+import { TemplateResponse } from "@/types/api/TemplateResponse";
 
-const app_response = (
+const appResponse = (
   status: boolean,
   message: string = "",
   {
@@ -30,4 +30,4 @@ const app_response = (
   return res;
 };
 
-export default app_response;
+export default appResponse;
