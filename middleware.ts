@@ -7,20 +7,19 @@ export async function middleware(request: NextRequest) {
   const path = url.pathname;
   if (path === "/") {
   } else {
-    console.log(request.cookies.get("token"));
     const loginUrl = new URL("/", request.url);
     if (!request.cookies.has("token")) {
       return NextResponse.redirect(loginUrl);
     }
 
     if (!request.cookies.get("token")!.value) {
-      deleteCookiesAuth(request);
+      deleteCookiesAuth();
       return NextResponse.redirect(loginUrl);
     }
 
     const checkToken: TemplateResponse = await verifyToken(request);
     if (checkToken.error) {
-      deleteCookiesAuth(request);
+      deleteCookiesAuth();
       return NextResponse.redirect(loginUrl);
     }
   }

@@ -8,7 +8,7 @@ import { useRouter } from "next/navigation";
 
 import { AppRoutes } from "@/constants";
 
-import { Sidebar } from "..";
+import Sidebar from "./Sidebar";
 
 type AdminLayoutProps = {
   children: React.ReactNode;
